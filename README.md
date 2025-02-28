@@ -1,53 +1,69 @@
-# autoware_nova_carter
+# Autoware Nova Carter
 Integration of NVIDIA Nova Carter with Autoware
+
+## Prerequisites
+
+- Docker installed on your system
+- Git and VCS tool installed
 
 ## Installation
 
-
-* Clone the repository
+1. Clone the repository and its dependencies:
 ```bash
+mkdir -p ~/autoware_nova_carter_ws/src
+cd ~/autoware_nova_carter_ws/src
 git clone https://github.com/tier4/autoware_nova_carter.git
-vcs import src < autoware_nova_carter/build_depends.repos
+vcs import . < autoware_nova_carter/build_depends.repos
 ```
 
-* Build Docker Image
+2. Build the Docker image:
 ```bash
-docker build -t autoware_nova_carter -f ./docker/Dockerfile .
+cd ~/autoware_nova_carter_ws
+docker build -t autoware_nova_carter -f src/autoware_nova_carter/.docker/Dockerfile .
 ```
 
-## Build Autoware Launch
-
+3. Build Autoware Launch Package:
 ```bash
+cd ~/autoware_nova_carter_ws
 git clone https://github.com/tier4/autoware_launch -b nova-carter-integration src/autoware_launch
-./docker_run_autoware.sh
-colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release --continue-on-error --packages-select autoware_launch autoware_nova_carter_description
+./docker_autoware.sh
+colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release \
+    --continue-on-error \
+    --packages-select autoware_launch autoware_nova_carter_description
 ```
 
-## Run Docker Container
+## Running the System
 
-TERMINAL 1
+### 1. Launch Nova Carter Sensor Drivers
+**In Terminal 1:**
 ```bash
 ./docker_sensing_vehicle.sh
-source /autoware_nova_carter/install/setup.bash
+source ~/autoware_nova_carter_ws/install/setup.bash
 ros2 launch autoware_nova_carter_sensing sensing.launch.xml
 ```
 
-TERMINAL 2
+### 2. Launch Nova Carter Interface
+**In Terminal 2:**
 ```bash
-docker exec -it vehicle_sensing /bin/bash
+docker exec -it sensing_vehicle /bin/bash
+source ~/autoware_nova_carter_ws/install/setup.bash
 ros2 launch autoware_nova_carter_vehicle vehicle.launch.xml
 ```
 
-TERMINAL 3
-```
+### 3. Launch Autoware
+**In Terminal 3:**
+```bash
 ./docker_run_autoware.sh
-source /autoware_nova_carter/install/setup.bash
-
-ros2 launch autoware_launch autoware.launch.xml map_path:=/autoware_map/shinagawa_2F vehicle_model:=autoware_nova_carter sensor_model:=sample_sensor_kit data_path:=/autoware_data
+source ~/autoware_nova_carter_ws/install/setup.bash
+ros2 launch autoware_launch autoware.launch.xml \
+    map_path:=/autoware_map/shinagawa_2F \
+    vehicle_model:=autoware_nova_carter \
+    sensor_model:=sample_sensor_kit \
+    data_path:=/autoware_data
 ```
 
-HOST Machine
-(You need to build autoware first)
+### 4. Launch Visualization
+**In Terminal 4 (on Host Machine):**
 ```bash
 source $HOME/autoware/install/setup.bash
 rviz2 -d src/launcher/autoware_launch/autoware_launch/rviz/autoware.rviz
