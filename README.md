@@ -18,15 +18,16 @@ vcs import . < autoware_nova_carter/build_depends.repos
 
 2. Build the Docker image:
 ```bash
-cd ~/autoware_nova_carter_ws
-docker build -t autoware_nova_carter -f src/autoware_nova_carter/.docker/Dockerfile .
+cd ~/autoware_nova_carter_ws/src/autoware_nova_carter
+docker build -t autoware_nova_carter -f .docker/Dockerfile .
 ```
 
 3. Build Autoware Launch Package:
 ```bash
-cd ~/autoware_nova_carter_ws
-git clone https://github.com/tier4/autoware_launch -b nova-carter-integration src/autoware_launch
-./docker_autoware.sh
+cd ~/autoware_nova_carter_ws/src
+git clone https://github.com/tier4/autoware_launch -b nova-carter-integration
+./autoware_nova_carter/.docker/docker_autoware.sh
+cd /autoware_nova_carter_ws
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release \
     --continue-on-error \
     --packages-select autoware_launch autoware_nova_carter_description
@@ -37,8 +38,8 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release \
 ### 1. Launch Nova Carter Sensor Drivers
 **In Terminal 1:**
 ```bash
-./docker_sensing_vehicle.sh
-source ~/autoware_nova_carter_ws/install/setup.bash
+~/autoware_nova_carter_ws/src/autoware_nova_carter/.docker/docker_sensing_vehicle.sh
+source /opt/autoware_nova_carter/setup.bash
 ros2 launch autoware_nova_carter_sensing sensing.launch.xml
 ```
 
@@ -46,15 +47,15 @@ ros2 launch autoware_nova_carter_sensing sensing.launch.xml
 **In Terminal 2:**
 ```bash
 docker exec -it sensing_vehicle /bin/bash
-source ~/autoware_nova_carter_ws/install/setup.bash
+source /opt/autoware_nova_carter/setup.bash
 ros2 launch autoware_nova_carter_vehicle vehicle.launch.xml
 ```
 
 ### 3. Launch Autoware
 **In Terminal 3:**
 ```bash
-./docker_run_autoware.sh
-source ~/autoware_nova_carter_ws/install/setup.bash
+~/autoware_nova_carter_ws/src/autoware_nova_carter/.docker/docker_autoware.sh
+source /autoware_nova_carter_ws/install/setup.bash
 ros2 launch autoware_launch autoware.launch.xml \
     map_path:=/autoware_map/shinagawa_2F \
     vehicle_model:=autoware_nova_carter \

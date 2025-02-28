@@ -3,7 +3,7 @@ docker run --privileged --runtime nvidia --gpus all --name autoware --net=host -
   -e RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
   -e CYCLONEDDS_URI=/autoware_nova_carter_ws/src/autoware_nova_carter/cyclonedds_config.xml \
   --volume="/home/nvidia/autoware_map:/autoware_map" \
-  --volume="/home/nvidia/autoware_nova_carter_ws/:/autoware_nova_carter_ws/" \
+  --volume="/home/nvidia/autoware_nova_carter_ws:/autoware_nova_carter_ws" \
   --volume="/mnt/nova_ssd/autoware_data:/autoware_data" \
   ghcr.io/autowarefoundation/autoware:universe-devel-cuda-20241223-arm64
 
